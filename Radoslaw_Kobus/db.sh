@@ -1,6 +1,9 @@
-sudo apt-get install software-properties-common
-sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
-sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://mariadb.kisiek.net/repo/10.2/ubuntu trusty main'
-
 sudo apt-get update
-sudo apt-get install mariadb-server
+sudo apt-get -y install mysql-server php5-mysql
+sudo mysql_install_db
+
+mysql -u root -p
+CREATE DATABASE drupal-db;
+CREATE USER admin@localhost IDENTIFIED BY 'admin';
+GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,CREATE TEMPORARY TABLES,LOCK TABLES ON drupal-db.* TO admin@localhost;
+FLUSH PRIVILEGES;
