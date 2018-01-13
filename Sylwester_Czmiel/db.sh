@@ -20,3 +20,4 @@ mysqladmin -u root password $PASS
 mysql -uroot -p$PASS -e "create database drupal"
 #mysql -uroot -p$PASS -e "grant all privileges on drupal.* to 'drupal'@'%' identifide by 'drupal!'"
 mysql -uroot -p$PASS -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON drupal.* TO 'drupal'@'%' IDENTIFIED BY 'password';"
+echo 'Kończę db'
