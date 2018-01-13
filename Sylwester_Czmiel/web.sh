@@ -22,6 +22,7 @@ sudo cp /var/www/html/sites/default/default.settings.php /var/www/html/sites/def
 sudo chmod 664 /var/www/html/sites/default/settings.php
 chmod a+w /var/www/html/sites/default/files
 sudo chown -R :www-data /var/www/html/*
+sudo rm /var/www/html/index.html
 echo 'Kończę web'
 
 
