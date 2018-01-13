@@ -1,5 +1,4 @@
-Project Vagrant Drupal
-Clustered drupal :
+Projekt Vagrant Drupal:
 
 W celu uruchomienia projektu należy:
 - Pobrać i zainstalować Vagranta (link poniżej)
