@@ -8,10 +8,6 @@ Vagrant.configure("2") do |config|
     web.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--memory", 512]
       v.customize ["modifyvm", :id, "--cpus", 1]
-      v.customize ["modifyvm", :id, "--name", "kornel-web"]
-      v.customize ["modifyvm", :id, "--nic2", "bridged"] 
-      v.customize ["modifyvm", :id, "--bridgeadapter2", "enp0s25"]
-      v.customize ["modifyvm", :id, "--nic1", "nat"]
     end
     web.vm.provision "shell", path: "web.sh"
   end
@@ -25,10 +21,6 @@ Vagrant.configure("2") do |config|
     db.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--memory", 512]
       v.customize ["modifyvm", :id, "--cpus", 1]
-      v.customize ["modifyvm", :id, "--name", "kornel-db"]
-      v.customize ["modifyvm", :id, "--nic2", "bridged"]
-      v.customize ["modifyvm", :id, "--bridgeadapter2", "enp0s25"]
-      v.customize ["modifyvm", :id, "--nic1", "nat"]
     end
     db.vm.provision "shell", path: "db.sh"
   end
