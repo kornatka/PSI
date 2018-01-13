@@ -2,6 +2,7 @@ sudo apt-get update
 sudo apt-get -y install apache2
 sudo apt-get -y install php5 libapache2-mod-php5 php5-mcrypt
 sudo apt-get -y install php5-gd
+sudo apt-get -y install php5-mysql
 sudo a2enmod rewrite
 cd ~
 wget http://ftp.drupal.org/files/projects/drupal-7.32.tar.gz
