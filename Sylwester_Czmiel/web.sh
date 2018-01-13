@@ -15,8 +15,9 @@ service apache2 start
 sudo wget http://ftp.drupal.org/files/projects/drupal-7.32.tar.gz
 sudo tar xzvf drupal*
 cd drupal*
+echo 'rozpakowany drupek'
 sudo rsync -avz . /var/www/html
-sudo mkdir /var/www/html/sites/default/files
+sudo mkdir -p /var/www/html/sites/default/files
 sudo cp /var/www/html/sites/default/default.settings.php /var/www/html/sites/default/settings.php
 sudo chmod 664 /var/www/html/sites/default/settings.php
 sudo chown -R :www-data /var/www/html/*
