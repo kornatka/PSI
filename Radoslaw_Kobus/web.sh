@@ -13,5 +13,6 @@ cd /var/www/html
 sudo mkdir /var/www/html/sites/default/files
 sudo cp /var/www/html/sites/default/default.settings.php /var/www/html/sites/default/settings.php
 sudo chmod 664 /var/www/html/sites/default/settings.php
+sudo chmod 664 /var/www/html/sites/default/files/
 sudo chown -R :www-data /var/www/html/*
 sudo service apache2 restart
