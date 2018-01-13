@@ -9,7 +9,7 @@ sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install -y vim nano mc screen
 
-sudo apt-get install php5-gd php5-curl libssh2-php -y
+sudo apt-get install php5 php5-gd php5-curl libssh2-php -y
 sudo apt-get install apache2 -y
 service apache2 start
 sudo wget http://ftp.drupal.org/files/projects/drupal-7.32.tar.gz
