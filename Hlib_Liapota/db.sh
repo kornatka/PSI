@@ -3,7 +3,7 @@ echo '------------------------------database configuration started--------------
 PASS="myPersonalPassword"
 cat << EOF >> /etc/network/interfaces.d/eth1.cfg
 auto eth1
-iface eth0 inet dhcp
+iface eth1 inet dhcp
 EOF
 ifup eth1
 sudo apt-get update
