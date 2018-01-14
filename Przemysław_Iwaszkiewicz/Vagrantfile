@@ -72,7 +72,7 @@ Vagrant.configure("2") do |config|
     www_server.vm.provision "shell", path: "www_server.sh"
   end
 
-  ######################################## kolejny server www poniżej ma mieć współdzielone /var/www z pierwszym 
+######################################## kolejny server www poniżej ma mieć współdzielone /var/www z pierwszym 
   # configure www2_server
   config.vm.define "www2" do |www2|
     www2.vm.box = "envimation/ubuntu-xenial"
@@ -92,6 +92,5 @@ Vagrant.configure("2") do |config|
     www2.vm.provision "shell", path: "www2.sh"
   end
 
-  
 end
 
