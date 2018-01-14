@@ -61,8 +61,8 @@ mkdir tmp
 cd tmp
 wget https://ftp.drupal.org/files/projects/drupal-8.4.4.tar.gz --no-check-certificate
 ## copy what we'v get for future use
-#cp /vagrant/drupal-8.4.4.tar.gz .
-cd /vagrant
+cp /tmp/drupal-8.4.4.tar.gz /vagrant
+cd /tmp
 sudo tar -xzf drupal-8.4.4.tar.gz -C /var/www 
 cd /var/www
 sudo ln -s ./drupal-8.4.4/ drupal
