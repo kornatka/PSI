@@ -1,1 +1,1 @@
-projekt + ocena ustna = 3
+projekt + ocena odpowiedzi ustnej = 3
