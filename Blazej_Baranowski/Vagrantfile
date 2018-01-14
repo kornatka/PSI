@@ -1,0 +1,29 @@
+Vagrant.configure("2") do |config|
+  config.vm.define "leb" do |leb|
+	leb.vm.box = "ubuntu/trusty64"
+	leb.vm.network "private_network", ip: "192.168.0.1"
+	leb.vm.network "forwarded_port", guest: 80, host: 8888
+	
+	leb.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--cpus", 1]
+	  v.customize ["modifyvm", :id, "--name", "web-blazej.baranowski"]
+	  v.customize ["modifyvm", :id, "--bridgeadapter2", "enp0s25"]
+      v.customize ["modifyvm", :id, "--nic1", "nat"]
+    end
+   leb.vm.provision "shell", path: "web.sh"
+  end
+
+  config.vm.define "baza" do |baza|
+	baza.vm.box = "ubuntu/trusty64"
+	baza.vm.network "private_network", ip: "192.168.0.2"
+	baza.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--cpus", 1]
+	  v.customize ["modifyvm", :id, "--name", "baza-blazej.baranowski"]
+	  v.customize ["modifyvm", :id, "--bridgeadapter2", "enp0s25"]
+      v.customize ["modifyvm", :id, "--nic1", "nat"]
+    end
+    baza.vm.provision "shell", path: "db.sh"
+  end
+end
