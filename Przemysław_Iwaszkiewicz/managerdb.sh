@@ -29,13 +29,13 @@ sudo apt -y install libdbd-mysql-perl
 sudo cat /vagrant/hosts >> /etc/hosts
 
 ################### uwaga! w celu ściągnięcia właściwej paczki mysql odkomentować linie z 2 hash'ami ##
-##mkdir tmp
-##cd tmp
+mkdir tmp
+cd tmp
 # source: https://dev.mysql.com/downloads/file/?id=473998
 # and docu: https://www.digitalocean.com/community/tutorials/how-to-create-a-multi-node-mysql-cluster-on-ubuntu-16-04
-##wget https://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.17-debian8-x86_64.deb --no-check-certificate
+wget https://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.17-debian8-x86_64.deb --no-check-certificate
 # copy downloaded package to local account for future usage 
-##cp mysql-cluster-gpl-7.4.17-debian8-x86_64.deb /vagrant
+cp mysql-cluster-gpl-7.4.17-debian8-x86_64.deb /vagrant
 # install downloaded package 
 ######### uwaga: przy rozpakowywaniu robi błąd?-sprawdzić, jeśli tak to tylko wypakować bez skryptu startowego
 ######sprawdzone: jest ok
