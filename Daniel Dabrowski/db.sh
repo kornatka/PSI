@@ -1,9 +1,20 @@
-sudo apt-get install software-properties-common
- sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
- sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://mariadb.kisiek.net/repo/10.2/ubuntu trusty main'
- 
- sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password haslo_do_zmiany' 
- sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password haslo_do_zmiany'
- 
- sudo apt-get  update
- sudo apt-get install -y mariadb-server
+#!/bin/bash
+echo 'DB conf'
+PASS="admin1"
+cat << EOF >> /etc/network/interfaces.d/eth1.cfg
+auto eth1
+iface eth0 inet dhcp
+EOF
+ifup eth1
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install -y vim nano mc screen iftop iptraf
+export DEBIAN_FRONTEND=noninteractive
+sudo -E apt-get -q -y install mysql-server
+sudo sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
+service mysql status
+sudo service mysql restart
+mysqladmin -u root password $PASS
+mysql -uroot -p$PASS -e "create database drupal"
+mysql -uroot -p$PASS -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON drupal.* TO 'drupal'@'%' IDENTIFIED BY 'password';"
+echo 'DB end'
