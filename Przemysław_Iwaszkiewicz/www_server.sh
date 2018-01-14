@@ -75,4 +75,9 @@ sudo chmod a+w  /var/www/drupal/sites/default/settings.php
 sed 's@DocumentRoot\ \/var\/www\/html@DocumentRoot\ \/var\/www\/drupal-8.4.4@g' -i.oryginal /etc/apache2/sites-available/000-default.conf 
 
 sudo service apache2 restart
-
+############################################################# poniżej instalacja serwera nfs
+sudo apt -y install nfs-kernel-server
+echo "/var/www 192.168.56.6(rw,sync)" > export
+sudo cp export /etc/export
+sudo service nfs-kernel-server restart
+############################################################ udostępniony po nfs katalog /var/wwww
