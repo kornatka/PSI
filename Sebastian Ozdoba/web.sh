@@ -1,8 +1,8 @@
 ﻿#!/bin/bash
-echo 'Konfiguracja serwera web'
+echo 'Zaczynam konfigurację web_drupal'
 cat << EOF >> /etc/network/interfaces.d/eth1.cfg
 auto eth1
-iface eth0 inet dhcp
+iface eth1 inet dhcp
 EOF
 ifup eth1
 sudo apt-get update
@@ -23,4 +23,4 @@ sudo chmod 664 /var/www/html/sites/default/settings.php
 chmod a+w /var/www/html/sites/default/files
 sudo chown -R :www-data /var/www/html/*
 sudo rm /var/www/html/index.html
-echo 'Koniec'
+echo 'Kończę konfigurację web_drupal'

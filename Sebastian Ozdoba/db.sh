@@ -1,9 +1,9 @@
 ﻿#!/bin/bash
-echo 'Konfiguracja serwera db'
+echo 'Zaczynam konfigurację db_drupal'
 PASS="haslo123"
 cat << EOF >> /etc/network/interfaces.d/eth1.cfg
 auto eth1
-iface eth0 inet dhcp
+iface eth1 inet dhcp
 EOF
 ifup eth1
 sudo apt-get update
@@ -20,4 +20,4 @@ mysqladmin -u root password $PASS
 mysql -uroot -p$PASS -e "create database drupal"
 #mysql -uroot -p$PASS -e "grant all privileges on drupal.* to 'drupal'@'%' identifide by 'drupal!'"
 mysql -uroot -p$PASS -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON drupal.* TO 'drupal'@'%' IDENTIFIED BY 'password';"
-echo 'Koniec'
+echo 'Kończe konfiguracje db_drupal'
