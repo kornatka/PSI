@@ -1,4 +1,4 @@
-Projekt Vagrant Drupal
+﻿Projekt Vagrant Drupal
 
 Opis: Utworzenie dwóch maszyn wirtualnych, jednej zawierającej instalator CMS - Drupal, drugiej zawierającej pakiet mysql z przygotowaną bazą danych. Efektem końcowym jest poprawne zainstalowanie CMS.
 
