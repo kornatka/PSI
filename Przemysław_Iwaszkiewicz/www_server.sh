@@ -57,9 +57,9 @@ sudo apt -y install php7.0-gd
 
 
 ## install drupal
-#mkdir tmp
-#cd tmp
-#wget https://ftp.drupal.org/files/projects/drupal-8.4.4.tar.gz --no-check-certificate
+mkdir tmp
+cd tmp
+wget https://ftp.drupal.org/files/projects/drupal-8.4.4.tar.gz --no-check-certificate
 ## copy what we'v get for future use
 #cp /vagrant/drupal-8.4.4.tar.gz .
 cd /vagrant
