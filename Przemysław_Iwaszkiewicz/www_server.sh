@@ -45,8 +45,8 @@ sed 's@DocumentRoot\ \/var\/www\/html@DocumentRoot\ \/var\/www\/drupal-8.4.4@g' 
 
 ############################################################# poniżej instalacja serwera nfs
 sudo apt -y install nfs-kernel-server
-echo "/var/www 192.168.56.6(rw,sync)" > export
-sudo cp export /etc/export
+echo "/var/www 192.168.56.6(rw,sync)" > exports
+sudo cp exports /etc/exports
 sudo service nfs-kernel-server restart
 
 
