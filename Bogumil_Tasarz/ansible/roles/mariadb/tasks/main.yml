@@ -1,0 +1,65 @@
+- name: Ensure mariadb installed
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mariadb-server
+    - python-mysqldb
+
+- name: "Configure database (hostname based, expects db[0-9]+ names)"
+  lineinfile:
+    path: /etc/mysql/my.cnf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: "^bind-address"
+      line: "bind-address = ::"
+    - regexp: "^#?server-id"
+      line: "server-id = {{ inventory_hostname[2:] }}"
+    - regexp: "#?log_bin"
+      line: "log_bin = /var/log/mysql/mysql-bin.log"
+  register: mariadb_config
+
+- name: restart mariadb if needed
+  service:
+    name: mysql
+    state: restarted
+  when: mariadb_config.changed
+
+- name: Create replication user
+  mysql_user:
+    name: "{{ mariadb.replication.user }}"
+    password: "{{ mariadb.replication.password }}"
+    host: "%"
+    priv: '*.*:REPLICATION SLAVE'
+    state: present
+  when: "'db_master' in group_names"
+
+- name: check replication slave status
+  mysql_replication:
+    mode: getslave
+  ignore_errors: true
+  register: slave_status
+  when: "'db_slave' in group_names"
+
+- name: Fetch master replication info
+  mysql_replication:
+    mode: getmaster
+  delegate_to: "{{ groups['db_master'][0] }}"
+  register: replication
+  when: "'db_slave' in group_names and (slave_status.failed or not slave_status.Is_Slave)"
+
+- name: Configure master on slave
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{ hostvars[groups['db_master'][0]].ansible_eth1.ipv4.address }}"
+    master_log_file: "{{ replication.File }}"
+    master_log_pos: "{{ replication.Position }}"
+    master_user: "{{ mariadb.replication.user }}"
+    master_password: "{{ mariadb.replication.password }}"
+  when: "'db_slave' in group_names and (slave_status.failed or not slave_status.Is_Slave)"
+
+- name: Start replication
+  mysql_replication:
+    mode: startslave
+  when: "'db_slave' in group_names and (slave_status.failed or not slave_status.Is_Slave)"

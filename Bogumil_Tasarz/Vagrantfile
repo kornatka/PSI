@@ -1,0 +1,40 @@
+Vagrant.configure("2") do |config|
+
+    hosts = ['db1','db2','db3','web1','web2']
+    hosts.each do |machine_id|
+ #       config.vm.network "private_network", type: "dhcp"
+        config.vm.define machine_id do |machine|
+
+            machine.vm.box = "ubuntu/trusty64"
+            machine.vm.hostname = machine_id
+            if machine_id.start_with?("web")
+                    machine.vm.network "forwarded_port", guest: 80, host: 8080+machine_id[3..-1].to_i #convert machine_id to integer
+
+            end
+            machine.vm.provider :virtualbox do |v|
+                v.customize ["modifyvm", :id, "--memory", 512]
+                v.customize ["modifyvm", :id, "--cpus", 1]
+                v.customize ["modifyvm", :id, "--name", machine_id]
+                v.customize ["modifyvm", :id, "--nic1", "nat"]
+      #          v.vm.network "private_network", type: "dhcp"
+            end
+            ip = "172.22."+(machine_id.start_with?("db") ? "1" : "2" )+"."+machine_id.gsub(/[a-z]/, '')
+            machine.vm.network "private_network", ip: ip, netmask: 16, virtualbox__intnet: "mynetwork"
+            if machine_id == hosts[-1]
+                config.vm.provision "ansible" do |ansible|
+                    ansible.limit = "all"
+                    ansible.playbook = "ansible/playbook.yml"
+                    ansible.groups = {
+                        "db_master" => ["db1"],
+                        "db_slave" => ["db[2:3]"],
+                        "db" => ["db[1:3]"],
+                        "web" => ["web[1:2]"], # silly group definition
+                        #      "all_groups:children" => ["group1", "group2"],
+                        #      "web:vars" => {"variable1" => 9,
+                        #                        "variable2" => "example"}
+                        }
+                end
+            end
+        end
+    end
+end

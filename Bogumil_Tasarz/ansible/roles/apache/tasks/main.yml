@@ -1,0 +1,29 @@
+- name: Ensure packages installed
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - apache2
+    - php5
+    - php5-gd
+    - php5-mysql
+    - php5-json
+  register: "apache2_install"
+
+- name: Enable mod-rewrite for apache2
+  apache2_module:
+    name: rewrite
+    state: present
+  register: apache2_rewrite
+
+- name: Set custom default VirtualHost
+  copy:
+    src: 000-default.conf
+    dest: /etc/apache2/sites-available/
+  register: apache_conf_file
+
+- name: restart apache2 if needed
+  service:
+    name: apache2
+    state: restarted
+  when: apache2_install.changed or apache2_rewrite.changed or apache_conf_file.changed

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  roles:
+    - system
+- hosts: db
+  roles:
+    - mariadb
+- hosts: web
+  roles:
+    - apache
+    - gluster
+    - drupal
