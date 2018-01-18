@@ -1,0 +1,109 @@
+# Drupal with Galera
+
+version: '3.1'
+
+services:
+ db_node1:
+  image: hauptmedia/mariadb:10.1
+  hostname: db_node1
+  networks:
+   - galera_network
+  ports:
+     - 13306:3306
+  environment:
+     - MYSQL_ROOT_PASSWORD=test
+     - REPLICATION_PASSWORD=test
+     - MYSQL_DATABASE=maria
+     - MYSQL_USER=maria
+     - MYSQL_PASSWORD=test
+     - GALERA=On
+     - NODE_NAME=db_node1
+     - CLUSTER_NAME=maria_cluster
+     - CLUSTER_ADDRESS=gcomm://
+  command: --wsrep-new-cluster
+
+ db_node2:
+   image: hauptmedia/mariadb:10.1
+   hostname: db_node2
+   links:
+     - db_node1
+   networks:
+    - galera_network
+   ports:
+     - 23306:3306
+   environment:
+     - REPLICATION_PASSWORD=test
+     - GALERA=On
+     - NODE_NAME=db_node2
+     - CLUSTER_NAME=maria_cluster
+     - CLUSTER_ADDRESS=gcomm://db_node1
+     
+ db_node3:
+   image: hauptmedia/mariadb:10.1
+   hostname: db_node3
+   links:
+     - db_node1
+   networks:
+    - galera_network
+   ports:
+     - 33306:3306
+   environment:
+     - REPLICATION_PASSWORD=test
+     - GALERA=On
+     - NODE_NAME=db_node3
+     - CLUSTER_NAME=maria_cluster
+     - CLUSTER_ADDRESS=gcomm://db_node1
+     
+ 
+ drupal1:
+  image: drupal:8.2-apache
+  networks:
+    - galera_network
+  expose:
+    - "80"
+  volumes:
+      - /var/www/html/modules
+      - /var/www/html/profiles
+      - /var/www/html/themes
+      # this takes advantage of the feature in Docker that a new anonymous
+      # volume (which is what we're creating here) will be initialized with the
+      # existing content of the image at the same location
+      - /var/www/html/sites
+  restart: always
+  
+ drupal2:
+  image: drupal:8.2-apache
+  networks:
+    - galera_network
+  expose:
+    - "80"
+  volumes:
+      - /var/www/html/modules
+      - /var/www/html/profiles
+      - /var/www/html/themes
+      - /var/www/html/sites
+  restart: always
+  
+ haproxy1:
+  image: haproxy
+  depends_on:
+   - drupal1
+   - drupal2
+  volumes:
+   # TODO
+   - ./storage/haproxy:/storage
+   - /var/run/docker.sock:/var/run/docker.sock
+   # to dziala
+   - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+  links:
+   - drupal1
+   - drupal2
+  networks:
+   - galera_network
+  ports:
+   - "80:80"
+  expose:
+   - "80"
+  
+networks:
+    galera_network:

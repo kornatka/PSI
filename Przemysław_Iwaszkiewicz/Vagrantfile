@@ -1,0 +1,96 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile for databases
+
+Vagrant.configure("2") do |config|
+
+  # configure database manager
+  config.vm.define "managerdb" do |managerdb|
+    managerdb.vm.box = "envimation/ubuntu-xenial"
+    managerdb.vm.boot_timeout = 600
+    managerdb.vm.provider "virtualbox"
+    managerdb.vm.hostname = "managerdb"
+    managerdb.vm.network "private_network", ip: "192.168.56.3"
+    managerdb.vm.provider "virtualbox" do |vb|
+      vb.name = "managerdb"
+      vb.memory = "1024"
+      vb.cpus = 1
+      vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    end
+    managerdb.vm.provision "shell", path: "managerdb.sh"
+  end
+
+   # configure node1
+  config.vm.define "node1db" do |node1db|
+    node1db.vm.box = "envimation/ubuntu-xenial"
+    node1db.vm.boot_timeout = 600
+    node1db.vm.provider "virtualbox"
+    node1db.vm.hostname = "node1db"
+    node1db.vm.network "private_network", ip: "192.168.56.4"
+    node1db.vm.provider "virtualbox" do |vb|
+      vb.name = "node1db"
+      vb.memory = "1024"
+      vb.cpus = 1
+      vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    end
+    node1db.vm.provision "shell", path: "node1db.sh"
+  end
+
+   # configure node2
+  config.vm.define "node2db" do |node1db|
+    node1db.vm.box = "envimation/ubuntu-xenial"
+    node1db.vm.boot_timeout = 600
+    node1db.vm.provider "virtualbox"
+    node1db.vm.hostname = "node2db"
+    node1db.vm.network "private_network", ip: "192.168.56.5"
+    node1db.vm.provider "virtualbox" do |vb|
+      vb.name = "node2db"
+      vb.memory = "1024"
+      vb.cpus = 1
+      vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    end
+    node1db.vm.provision "shell", path: "node2db.sh"
+  end
+
+  # configure www_server
+  config.vm.define "www_server" do |www_server|
+    www_server.vm.box = "envimation/ubuntu-xenial"
+    www_server.vm.boot_timeout = 600
+    www_server.vm.provider "virtualbox"
+    www_server.vm.hostname = "www-server"
+    www_server.vm.network "private_network", ip: "192.168.56.2"
+#    www_server.vm.network "public_network", bridge: "wlp16s0"
+# powyższe nie działa wjięc przekierujemy porty: (zewnętrzny musi być większy niż 1024 więc 8080
+    www_server.vm.network "forwarded_port", guest: 80, host: 8080
+    www_server.vm.provider "virtualbox" do |vb|
+      vb.name = "www_server"
+      vb.memory = "1024"
+      vb.cpus = 1
+      vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    end
+    www_server.vm.provision "shell", path: "www_server.sh"
+  end
+
+######################################## kolejny server www poniżej ma mieć współdzielone /var/www z pierwszym 
+  # configure www2_server
+  config.vm.define "www2" do |www2|
+    www2.vm.box = "envimation/ubuntu-xenial"
+    www2.vm.boot_timeout = 600
+    www2.vm.provider "virtualbox"
+    www2.vm.hostname = "www2"
+    www2.vm.network "private_network", ip: "192.168.56.6"
+#    www_server.vm.network "public_network", bridge: "wlp16s0"
+# powyższe nie działa wjięc przekierujemy porty: (zewnętrzny musi być większy niż 1024 więc 8080
+    www2.vm.network "forwarded_port", guest: 80, host: 8081
+    www2.vm.provider "virtualbox" do |vb|
+      vb.name = "www2"
+      vb.memory = "1024"
+      vb.cpus = 1
+      vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    end
+    www2.vm.provision "shell", path: "www2.sh"
+  end
+
+end
+

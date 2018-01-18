@@ -1,0 +1,24 @@
+Vagrant.configure("2") do |config|
+  config.vm.define "web" do |webInstance|
+	webInstance.vm.box = "ubuntu/trusty64"
+	webInstance.vm.network "private_network", ip: "192.168.0.111"
+  webInstance.vm.host_name = "liapota.psi.lo"
+	webInstance.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--cpus", 1]
+	  v.customize ["modifyvm", :id, "--name", "liapota-web"]
+    end
+    webInstance.vm.provision "shell", path: "web.sh"
+  end
+
+  config.vm.define "db" do |dbInstance|
+	dbInstance.vm.box = "ubuntu/trusty64"
+	dbInstance.vm.network "private_network", ip: "192.168.55.112"
+	dbInstance.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--cpus", 1]
+	  v.customize ["modifyvm", :id, "--name", "liapota-db"]
+    end
+    dbInstance.vm.provision "shell", path: "db.sh"
+  end
+end
