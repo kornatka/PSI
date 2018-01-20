@@ -1,0 +1,18 @@
+Vagrant.configure("2") do |config|
+
+    config.vm.define "db" do |db|
+    db.vm.box = "ubuntu/xenial32"
+    db.vm.hostname = 'bazadb'
+    db.vm.network "private_network", ip: "192.168.56.2"
+    db.vm.box_url = "ubuntu/xenial32"
+
+    db.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--cpus", 1]
+      v.customize ["modifyvm", :id, "--name", "bazadb"]
+    end
+    db.vm.provision "shell", path: "baza.sh"
+  end
+
+
+end
