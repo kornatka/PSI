@@ -1,0 +1,29 @@
+Vagrant.configure("2") do |config|
+
+	config.vm.define "SQL" do |sql|
+	sql.vm.box = "ubuntu/trusty64"
+	sql.vm.box_url = "ubuntu/trusty64"
+
+	sql.vm.provider "virtualbox" do |v|
+  	v.name = "SQL"
+	end
+
+	sql.vm.provision "shell", path: "test.sh"
+	end
+
+
+	config.vm.define "WEB" do |web|
+	web.vm.box = "ubuntu/trusty64"	
+	web.vm.hostname = 'WEB'
+	web.vm.box_url = "ubuntu/trusty64"
+
+	web.vm.provider "virtualbox" do |v|
+  	v.name = "WEB"
+	end
+
+	end
+
+end
+
+
+

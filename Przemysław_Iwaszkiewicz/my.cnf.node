@@ -1,0 +1,6 @@
+[mysqld]
+# Options for mysqld process:
+ndbcluster                      # run NDB storage engine
+
+[mysql_cluster]
+ndb-connectstring=manager
