@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--cpus", 1]
 	  v.customize ["modifyvm", :id, "--name", "SerwerWeb"]
     end
-    subconfig.vm.provision "shell", path: "PanDa.sh"
+    subconfig.vm.provision "shell", path: "WEB.sh"
   end
 
   config.vm.define "db" do |subconfig|
@@ -18,6 +18,6 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--cpus", 1]
 	  v.customize ["modifyvm", :id, "--name", "SerwerDB"]
     end
-    subconfig.vm.provision "shell", path: "Trzy.sh"
+    subconfig.vm.provision "shell", path: "DB.sh"
   end
 end
