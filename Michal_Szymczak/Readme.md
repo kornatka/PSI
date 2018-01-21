@@ -14,7 +14,7 @@ Aby zrealizowaæ projekt nale¿y:
 
 
 Przydatne linki:
-Vrtual Box:
+VirtualBox:
 https://www.virtualbox.org/
 Vagrant:
 https://www.vagrantup.com/
