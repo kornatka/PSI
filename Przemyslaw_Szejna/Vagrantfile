@@ -1,0 +1,74 @@
+# VAGRANT v2 file
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+    config.vm.define "load_balancer" do |lb|
+        lb.vm.box = "hashicorp/precise32"
+        lb.vm.network "private_network", ip: "192.168.50.10"
+        lb.vm.provision "file", source: "./conf/nginx.conf", destination: "/tmp/nginx.conf"
+        lb.vm.provision "shell", path: "./scripts/web_loadbalancer.sh"
+        lb.vm.provider :virtualbox do |v|
+              v.customize ["modifyvm", :id, "--memory", 256]
+              v.customize ["modifyvm", :id, "--cpus", 1]
+        end
+    end
+
+    2.times do |n|
+        config.vm.define "web"+(1+n).to_s do |web|
+            web.vm.box = "hashicorp/precise32"
+            web.vm.box_version = "1.0.0"
+            web.vm.hostname = 'web-'+(1+n).to_s+'.local' # drupal-web-1.local
+            web.vm.box_url = "hashicorp/precise32"
+            web.vm.network "private_network", ip: "192.168.50.1"+(1+n).to_s
+            web.vm.provider :virtualbox do |v|
+                  v.customize ["modifyvm", :id, "--memory", 1024]
+                  v.customize ["modifyvm", :id, "--cpus", 1]
+            end
+            web.vm.provision "file", source: "./conf/wordpress.config.php", destination: "/tmp/wordpress.config.php"
+            web.vm.provision "file", source: "./conf/wordpress.conf", destination: "/tmp/wordpress.conf"
+            web.vm.provision "shell", path: "./scripts/web.sh"
+        end
+    end
+
+    config.vm.define "db1" do |dblb|
+        dblb.vm.box = "aspyatkin/ubuntu-16.04-server-amd64"
+        dblb.vm.network "private_network", ip: "192.168.50.20"
+        dblb.vm.provider :virtualbox do |v|
+            v.customize ["modifyvm", :id, "--memory", 512]
+            v.customize ["modifyvm", :id, "--cpus", 1]
+        end
+        dblb.vm.provision "file", source: "./conf/wordpress.sql", destination: "/tmp/wordpress.sql"
+        dblb.vm.provision "file", source: "./conf/galera1.conf", destination: "/tmp/galera.conf"
+        dblb.vm.provision "shell", path: "./scripts/db_galera_config.sh"
+        dblb.vm.provision "shell", path: "./scripts/db_galera_reboot.sh", run: "always"
+    end
+
+    2.times do |n|
+        config.vm.define "db"+(2+n).to_s do |db|
+            db.vm.box = "aspyatkin/ubuntu-16.04-server-amd64"
+            db.vm.network "private_network", ip: "192.168.50.2"+(1+n).to_s
+            db.vm.provider :virtualbox do |v|
+                v.customize ["modifyvm", :id, "--memory", 512]
+                v.customize ["modifyvm", :id, "--cpus", 1]
+            end
+            #db.vm.provision "file", source: "./conf/wordpress.sql", destination: "/tmp/wordpress.sql"
+            db.vm.provision "file", source: "./conf/galera"+(2+n).to_s+".conf", destination: "/tmp/galera.conf"
+            db.vm.provision "shell", path: "./scripts/db.sh"
+            db.vm.provision "shell", path: "./scripts/db_reboot.sh", run: "always"
+        end
+    end
+
+    config.vm.define "db_load_balancer" do |lb|
+            lb.vm.box = "hashicorp/precise32"
+            lb.vm.network "private_network", ip: "192.168.50.25"
+            lb.vm.provision "file", source: "./conf/haproxy.conf", destination: "/tmp/haproxy.conf"
+            lb.vm.provision "shell", path: "./scripts/db_loadbalancer.sh"
+            lb.vm.provider :virtualbox do |v|
+                  v.customize ["modifyvm", :id, "--memory", 256]
+                  v.customize ["modifyvm", :id, "--cpus", 1]
+            end
+        end
+
+
+end
