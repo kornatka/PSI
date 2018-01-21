@@ -1,4 +1,4 @@
-# Drupal with Galera
+# Drupal with Galera & HAProxy
 
 version: '3.1'
 
@@ -9,7 +9,7 @@ services:
   networks:
    - galera_network
   ports:
-     - 13306:3306
+     - "13306:3306"
   environment:
      - MYSQL_ROOT_PASSWORD=test
      - REPLICATION_PASSWORD=test
@@ -30,7 +30,7 @@ services:
    networks:
     - galera_network
    ports:
-     - 23306:3306
+     - "23306:3306"
    environment:
      - REPLICATION_PASSWORD=test
      - GALERA=On
@@ -46,7 +46,7 @@ services:
    networks:
     - galera_network
    ports:
-     - 33306:3306
+     - "33306:3306"
    environment:
      - REPLICATION_PASSWORD=test
      - GALERA=On
@@ -54,34 +54,36 @@ services:
      - CLUSTER_NAME=maria_cluster
      - CLUSTER_ADDRESS=gcomm://db_node1
      
- 
  drupal1:
   image: drupal:8.2-apache
+  hostname: drupal1
   networks:
     - galera_network
   expose:
+  # Expose ports without publishing them to the host machine - they’ll only be accessible to linked services
     - "80"
   volumes:
-      - /var/www/html/modules
-      - /var/www/html/profiles
-      - /var/www/html/themes
-      # this takes advantage of the feature in Docker that a new anonymous
-      # volume (which is what we're creating here) will be initialized with the
-      # existing content of the image at the same location
-      - /var/www/html/sites
+     - "modules:/var/www/html/modules"
+     - "profiles:/var/www/html/profiles"
+     - "themes:/var/www/html/themes"
+     # this takes advantage of the feature in Docker that a new anonymous
+     # volume (which is what we're creating here) will be initialized with the
+     # existing content of the image at the same location
+     - "sites:/var/www/html/sites"
   restart: always
   
  drupal2:
   image: drupal:8.2-apache
+  hostname: drupal2
   networks:
     - galera_network
   expose:
     - "80"
   volumes:
-      - /var/www/html/modules
-      - /var/www/html/profiles
-      - /var/www/html/themes
-      - /var/www/html/sites
+     - "modules:/var/www/html/modules"
+     - "profiles:/var/www/html/profiles"
+     - "themes:/var/www/html/themes"
+     - "sites:/var/www/html/sites"
   restart: always
   
  haproxy1:
@@ -90,10 +92,9 @@ services:
    - drupal1
    - drupal2
   volumes:
-   # TODO
    - ./storage/haproxy:/storage
+   # unix socket the Docker daemon listens on by default and it can be used to communicate with the daemon from within a container.
    - /var/run/docker.sock:/var/run/docker.sock
-   # to dziala
    - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
   links:
    - drupal1
@@ -101,9 +102,15 @@ services:
   networks:
    - galera_network
   ports:
-   - "80:80"
-  expose:
-   - "80"
+  # YAML will parse numbers in the format xx:yy as sexagesimal (base 60)
+  # always explicitly specify your port mappings as strings
+   - "8080:80"
   
 networks:
     galera_network:
+
+volumes:
+  modules:
+  profiles:
+  themes:
+  sites:  
