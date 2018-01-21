@@ -1,0 +1,88 @@
+- name: Download and unarchive Drupal
+  unarchive:
+    src: "{{ drupal.download_url }}"
+    dest: /var/www/
+    remote_src: yes
+    owner: www-data
+    group: www-data
+
+- name: Copy preconfigured files
+  copy:
+    src: sites
+    dest: "/var/www/{{ drupal.version }}/"
+    owner: www-data
+    group: www-data
+
+- name: Substitute custom config
+  template:
+    src: files/settings.php.j2
+    dest: "/var/www/{{ drupal.version }}/sites/default/settings.php"
+    mode: 0644
+    owner: www-data
+    group: www-data
+
+- name: Create drupal database
+  mysql_db:
+    name: "{{ drupal.db.name }}"
+    collation: utf8_general_ci
+    encoding: utf8
+    state: present
+  delegate_to: "{{ groups['db_master'][0] }}"
+  run_once: True
+
+- name: Create drupal database user
+  mysql_user:
+    name: "{{ drupal.db.user }}"
+    host: "%"
+    password: "{{ drupal.db.password }}"
+    priv: "{{ drupal.db.name }}.*:all"
+    state: present
+  delegate_to: "{{ groups['db_master'][0] }}"
+  run_once: True
+
+- name: Copy database to master host
+  copy:
+    src: drupal.sql.xz
+    dest: /tmp
+  delegate_to: "{{ groups['db_master'][0] }}"
+  run_once: true
+
+- name: Import dump
+  mysql_db:
+    name: "{{ drupal.db.name }}"
+    state: import
+    target: /tmp/drupal.sql.xz
+  delegate_to: "{{ groups['db_master'][0] }}"
+  run_once: true
+
+- name: Ensure drush is installed
+  stat:
+    path: /usr/local/bin/drush
+  register: drush_bin_state
+
+- name: install drush
+  get_url:
+    url: https://github.com/drush-ops/drush/releases/download/8.1.15/drush.phar
+    dest: /usr/local/bin/drush
+  when: drush_bin_state.stat.isfile is not defined
+
+- name: Ensure drush is executable
+  file:
+    path: /usr/local/bin/drush
+    mode: 0755
+
+- name: Regenerate cache files
+  shell: /usr/local/bin/drush cache-rebuild
+  args:
+    chdir: "/var/www/{{ drupal.version }}/"
+
+- name: Remove stale html directory
+  file:
+    path: /var/www/html
+    state: absent
+
+- name: Symlink html to Drupal
+  file:
+    dest: /var/www/html
+    src: "/var/www/{{ drupal.version }}"
+    state: link

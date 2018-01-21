@@ -1,0 +1,31 @@
+<?php
+
+$databases = [];
+
+$config_directories = [];
+
+$settings['hash_salt'] = '97v2rI2t40avnoMAt6MwQ0JdJ8KjWlorLh0JkDOilrhoPuv-PgslITJ4vSEj4gW3mCF_AWxdoQ';
+
+$settings['update_free_access'] = FALSE;
+
+$settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
+
+$settings['file_scan_ignore_directories'] = [
+  'node_modules',
+  'bower_components',
+];
+
+$settings['entity_update_batch_size'] = 50;
+
+$databases['default']['default'] = [
+  'database' => '{{ drupal.db.name }}',
+  'username' => '{{ drupal.db.user }}',
+  'password' => '{{ drupal.db.password }}',
+  'prefix' => '',
+  'host' => '{{ hostvars[groups['db_master'][0]].ansible_eth1.ipv4.address }}',
+  'port' => '3306',
+  'namespace' => 'Drupal\\Core\\Database\\Driver\\mysql',
+  'driver' => 'mysql',
+];
+$settings['install_profile'] = 'standard';
+$config_directories['sync'] = 'sites/default/files/config_rADLGjJjfeLd7LHRzw6-vGqMjTfh6R81wSjc54IVwQRoeJ85dapJ8ZnkOFo1VaSTHcPXKi7dPA/sync';

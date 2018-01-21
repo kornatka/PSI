@@ -1,0 +1,15 @@
+mariadb:
+  replication:
+    user: replication_user
+    password: iemencysiondstro
+gluster:
+  name: drupal
+  brick: /srv/gluster/drupal
+  mount: /var/www/drupal-8.4.4/sites/default/files
+drupal:
+  version: drupal-8.4.4
+  download_url: "https://ftp.drupal.org/files/projects/drupal-8.4.4.tar.gz"
+  db:
+    name: drupal
+    user: drupal
+    password: otoifiesposarysi

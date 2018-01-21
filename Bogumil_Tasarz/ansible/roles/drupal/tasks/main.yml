@@ -1,0 +1,7 @@
+- name: Check for stale default directory
+  stat:
+    path: /var/www/html
+  register: stale_www_html
+
+- include: drupal.yml
+  when: "stale_www_html.stat.isdir is defined and stale_www_html.stat.isdir"
