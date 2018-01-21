@@ -1,9 +1,10 @@
-sudo apt-get install software-properties-common
-sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
-sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://mariadb.kisiek.net/repo/10.2/ubuntu trusty main'
+sudo apt update
+sudo apt -y full-upgrade
 
-sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password haslo_do_zmiany' 
-sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password haslo_do_zmiany'
+sudo apt -y install mariadb-server
 
-sudo apt-get  update
-sudo apt-get install -y mariadb-server
+mysql -u root << SKRYPT
+create database drupal;
+GRANT ALL PRIVILEGES ON *.* TO 'magda'@'*' IDENTIFIED BY 'qwerty' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'drupal'@'192.168.56.2' IDENTIFIED BY 'qwerty1' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.56.3' IDENTIFIED BY 'qwerty2' WITH GRANT OPTION;
