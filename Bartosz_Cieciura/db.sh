@@ -2,7 +2,7 @@
 echo 'konfiguruję maszynę bazodanowa'
 
 echo 'definiuję zmienną którą wykorzystam w dalszej części skryptu'
-	PASS="dupa13"
+	PASS="pass123"
 	
 echo 'konfiguruję sieć'
 cat << EOF >> /etc/network/interfaces.d/eth1.cfg

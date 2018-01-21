@@ -4,20 +4,17 @@ Vagrant.configure("2") do |config|
     web.vm.box = "ubuntu/trusty64"
     web.vm.hostname = 'web01'
     web.vm.box_url = "ubuntu/trusty64"
-	web.vm.network "private_network", ip: "192.168.10.9"
 
+	
+		web.vm.provider :virtualbox do |vvv|
+      vvv.customize ["modifyvm", :id, "--memory", 512]
+      vvv.customize ["modifyvm", :id, "--cpus", 1]
+      vvv.customize ["modifyvm", :id, "--name", "web01"]
+      vvv.customize ["modifyvm", :id, "--nic2", "bridged"]
+	  vvv.customize ["modifyvm", :id, "--bridgeadapter2", "Realtek PCIe GBE Family Controller"]
+      vvv.customize ["modifyvm", :id, "--nic1", "nat"]
 
-
-	web.vm.provider :virtualbox do |web|
-      web.customize ["modifyvm", :id, "--memory", 512]
-      web.customize ["modifyvm", :id, "--cpus", 1]
-      web.customize ["modifyvm", :id, "--name", "web01"]
-      web.customize ["modifyvm", :id, "--nic2", "bridged"]
-	  web.customize ["modifyvm", :id, "--bridgeadapter2", "Realtek PCIe GBE Family Controller"]
-      web.customize ["modifyvm", :id, "--nic1", "nat"]
-	  
-
-	  	
+ 	
 	
 	  
     end
@@ -25,25 +22,32 @@ Vagrant.configure("2") do |config|
 		web.vm.provision "shell", :path => "web.sh"
 end
 
-	config.vm.define "db" do |db|
-    db.vm.box = "ubuntu/trusty64"
-    db.vm.hostname = 'db01'
-    db.vm.box_url = "ubuntu/trusty64"
+	config.vm.define "db" do |web|
+    web.vm.box = "ubuntu/trusty64"
+    web.vm.hostname = 'db01'
+    web.vm.box_url = "ubuntu/trusty64"
 
-	db.vm.provider :virtualbox do |db|
-      db.customize ["modifyvm", :id, "--memory", 512]
-      db.customize ["modifyvm", :id, "--cpus", 1]
-      db.customize ["modifyvm", :id, "--name", "db01"]
-      db.customize ["modifyvm", :id, "--nic2", "bridged"]
-	 
-	 db.ustomize ["modifyvm", :id, "--bridgeadapter2", "Realtek PCIe GBE Family Controller"]
-      db.customize ["modifyvm", :id, "--nic1", "nat"]
+	web.vm.provider :virtualbox do |vvv|
+      vvv.customize ["modifyvm", :id, "--memory", 512]
+      vvv.customize ["modifyvm", :id, "--cpus", 1]
+      vvv.customize ["modifyvm", :id, "--name", "db01"]
+      vvv.customize ["modifyvm", :id, "--nic2", "bridged"]
+	  vvv.customize ["modifyvm", :id, "--bridgeadapter2", "Realtek PCIe GBE Family Controller"]
+      vvv.customize ["modifyvm", :id, "--nic1", "nat"]
 
 	   end
-		db.vm.provision "shell", :path => "init.sh"
+		web.vm.provision "shell", :path => "init.sh"
 		web.vm.provision "shell", :path => "db.sh"
+
   end
 
 
 end
 
+
+
+
+	  
+
+
+	
