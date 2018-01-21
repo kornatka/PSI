@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+    web:
+        image: drupal:8.4-apache
+        ports:
+        - "8000:8000"
+        expose:
+        - "80"
+        volumes:
+        - /var/www/html/modules
+        - /var/www/html/profiles
+        - /var/www/html/themes
+        - /var/www/html/sites
+        restart: on-failure
+        
+    db:
+        image: hauptmedia/mariadb:10.1
+        ports:
+        - 13306:3306
+        environment:
+        - MYSQL_ROOT_PASSWORD=test
+        - REPLICATION_PASSWORD=test
+        - MYSQL_DATABASE=maria
+        - MYSQL_USER=maria
+        - MYSQL_PASSWORD=test
