@@ -1,0 +1,7 @@
+# plik do dołączenia do wszystkich hosts 
+# w sieci 192.168.25 będą 4 hosty: 3 z bazami danych oraz 1 z serverem www
+192.168.56.2    serverwww
+192.168.56.3    manager
+192.168.56.4    node1
+192.168.56.5    node2
+192.168.56.6    www2
