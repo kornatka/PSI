@@ -1,0 +1,5 @@
+Oprócz podstawowego pliku vagrantfile nie są potrzebne żadne dodatkowe pliki.
+Przed uruchomieniem należy stworzyć folder www/html, a więc
+
+mkdir www/html
+vagrant up
