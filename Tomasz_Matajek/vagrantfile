@@ -1,0 +1,357 @@
+ENV["LC_ALL"] = "en_US.UTF-8"
+
+Vagrant.configure("2") do |config|
+  	
+  config.vm.define "data1" do |data1|
+  	data1.vm.provider :virtualbox do |v|
+      v.memory = 1536
+      v.cpus = 2
+    end
+    data1.vm.box = "bento/ubuntu-16.04"
+    data1.vm.hostname = "data1"
+    data1.vm.network "public_network", bridge: "en0: Ethernet"
+    data1.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update && sudo apt-get upgrade -y
+      sudo apt-get install -y avahi-daemon libaio1
+      timedatectl set-timezone Europe/Warsaw
+      sudo timedatectl set-ntp on
+      wget https://dev.mysql.com/get/Downloads/MySQL-Cluster-7.5/mysql-cluster-gpl-7.5.5-debian8-x86_64.deb --progress=bar:force
+      sudo dpkg -i mysql-cluster-gpl-7.5.5-debian8-x86_64.deb
+    SHELL
+  end
+ 
+  config.vm.define "data2" do |data2|
+  	data2.vm.provider :virtualbox do |v|
+      v.memory = 1536
+      v.cpus = 2
+    end
+    data2.vm.box = "bento/ubuntu-16.04"
+    data2.vm.hostname = "data2"
+    data2.vm.network "public_network", bridge: "en0: Ethernet"
+    data2.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update && sudo apt-get upgrade -y
+      sudo apt-get install -y avahi-daemon libaio1
+      timedatectl set-timezone Europe/Warsaw
+      sudo timedatectl set-ntp on
+      wget https://dev.mysql.com/get/Downloads/MySQL-Cluster-7.5/mysql-cluster-gpl-7.5.5-debian8-x86_64.deb --progress=bar:force
+      sudo dpkg -i mysql-cluster-gpl-7.5.5-debian8-x86_64.deb
+    SHELL
+  end
+  
+  config.vm.define "management" do |management|
+  	management.vm.provider :virtualbox do |v|
+      v.memory = 1536
+      v.cpus = 2
+    end
+    management.vm.box = "bento/ubuntu-16.04"
+    management.vm.hostname = "management"
+    management.vm.network "public_network", bridge: "en0: Ethernet"
+    management.vm.provision "shell", inline: <<-SHELL
+    	sudo apt-get update && sudo apt-get upgrade -y
+      sudo apt-get install -y avahi-daemon libaio1
+      timedatectl set-timezone Europe/Warsaw
+      sudo timedatectl set-ntp on
+      wget https://dev.mysql.com/get/Downloads/MySQL-Cluster-7.5/mysql-cluster-gpl-7.5.5-debian8-x86_64.deb --progress=bar:force
+      sudo dpkg -i mysql-cluster-gpl-7.5.5-debian8-x86_64.deb
+		SHELL
+  end
+  
+  #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+  
+  config.vm.define "data1" do |data1|
+  	data1.vm.provision "shell", inline: <<-SHELL
+  		echo "[mysql_cluster]" > /etc/my.cnf 
+			echo "ndb-connectstring=management.local" >> /etc/my.cnf
+			
+			sudo mkdir -p /usr/local/mysql/data
+			#sudo /opt/mysql/server-5.7/bin/ndbd
+			
+			echo "#!/bin/sh -e" > /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# rc.local" >> /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# This script is executed at the end of each multiuser runlevel." >> /etc/rc.local
+			echo "# Make sure that the script will "exit 0" on success or any other" >> /etc/rc.local
+			echo "# value on error." >> /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# In order to enable or disable this script just change the execution" >> /etc/rc.local
+			echo "# bits." >> /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# By default this script does nothing." >> /etc/rc.local
+			echo "sudo /opt/mysql/server-5.7/bin/ndbd" >> /etc/rc.local
+			echo "exit 0" >> /etc/rc.local
+			
+			sudo systemctl enable rc-local.service
+			
+			echo "\n     --- Installation of data node 1 complete ---\n"
+      if [ -f /var/run/reboot-required ]; then
+    		echo "             ***   REBOOT REQUIRED   ***"
+    		echo "                                       "
+			fi
+  	SHELL
+  end
+  
+  config.vm.define "data2" do |data2|
+  	data2.vm.provision "shell", inline: <<-SHELL
+  		echo "[mysql_cluster]" > /etc/my.cnf 
+			echo "ndb-connectstring=management.local" >> /etc/my.cnf
+			
+			sudo mkdir -p /usr/local/mysql/data
+			#sudo /opt/mysql/server-5.7/bin/ndbd
+			
+			echo "#!/bin/sh -e" > /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# rc.local" >> /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# This script is executed at the end of each multiuser runlevel." >> /etc/rc.local
+			echo "# Make sure that the script will "exit 0" on success or any other" >> /etc/rc.local
+			echo "# value on error." >> /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# In order to enable or disable this script just change the execution" >> /etc/rc.local
+			echo "# bits." >> /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# By default this script does nothing." >> /etc/rc.local
+			echo "sudo /opt/mysql/server-5.7/bin/ndbd" >> /etc/rc.local
+			echo "exit 0" >> /etc/rc.local
+			
+			sudo systemctl enable rc-local.service
+			
+			echo "\n    --- Installation of data node 2 complete ---\n"
+      if [ -f /var/run/reboot-required ]; then
+    		echo "             ***   REBOOT REQUIRED  ***"
+    		echo "                                       "
+			fi
+  	SHELL
+  end
+  
+  config.vm.define "management" do |management|	
+  	management.vm.provision "shell", inline: <<-SHELL
+  		sudo mkdir -p /var/lib/mysql-cluster
+      echo "[ndb_mgmd]" > /var/lib/mysql-cluster/config.ini
+			echo "hostname=management.local" >> /var/lib/mysql-cluster/config.ini  # Hostname z Avahi
+			echo "datadir=/var/lib/mysql-cluster" >> /var/lib/mysql-cluster/config.ini 
+
+			echo "[ndbd]" >> /var/lib/mysql-cluster/config.ini
+			echo "hostname=data1.local" >> /var/lib/mysql-cluster/config.ini	# Hostname z Avahi   
+			echo "datadir=/usr/local/mysql/data" >> /var/lib/mysql-cluster/config.ini   
+
+			echo "[ndbd]" >> /var/lib/mysql-cluster/config.ini
+			echo "hostname=data2.local" >> /var/lib/mysql-cluster/config.ini   # Hostname z Avahi
+			echo "datadir=/usr/local/mysql/data" >> /var/lib/mysql-cluster/config.ini 
+
+			echo "[mysqld]" >> /var/lib/mysql-cluster/config.ini			
+			echo "hostname=management.local" >> /var/lib/mysql-cluster/config.ini # ten sam nod co management
+			
+			sudo /opt/mysql/server-5.7/bin/ndb_mgmd -f /var/lib/mysql-cluster/config.ini
+			
+			echo "#!/bin/sh -e" > /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# rc.local" >> /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# This script is executed at the end of each multiuser runlevel." >> /etc/rc.local
+			echo "# Make sure that the script will "exit 0" on success or any other" >> /etc/rc.local
+			echo "# value on error." >> /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# In order to enable or disable this script just change the execution" >> /etc/rc.local
+			echo "# bits." >> /etc/rc.local
+			echo "#" >> /etc/rc.local
+			echo "# By default this script does nothing." >> /etc/rc.local
+			echo "sudo /opt/mysql/server-5.7/bin/ndb_mgmd -f /var/lib/mysql-cluster/config.ini" >> /etc/rc.local
+			echo "exit 0" >> /etc/rc.local
+			
+			sudo systemctl enable rc-local.service
+			
+			echo "\n     --- Installation of management node complete ---\n"
+			if [ -f /var/run/reboot-required ]; then
+				echo "                ***   REBOOT REQUIRED   ***"
+				echo "                                           "
+			fi
+			
+			echo "[mysqld]" > /etc/my.cnf
+			echo "ndbcluster" >> /etc/my.cnf # run NDB storage engine
+			echo "datadir=/data/mysql" >> /etc/my.cnf
+			
+			sudo groupadd mysql
+			sudo useradd -r -g mysql -s /bin/false mysql
+			sudo mkdir -p /data/mysql
+			sudo mkdir -p /var/lib/mysql-files
+			sudo chown mysql:mysql /var/lib/mysql-files
+			sudo chown mysql:mysql /data/mysql
+			
+			sudo /opt/mysql/server-5.7/bin/mysqld --initialize-insecure --user=mysql --datadir=/data/mysql 
+			sudo cp /opt/mysql/server-5.7/support-files/mysql.server /etc/init.d/mysqld
+			sudo systemctl enable mysqld.service
+			
+			sudo ln -s /opt/mysql/server-5.7/bin/mysql /usr/bin/
+			
+			echo "#!/bin/sh -e" > /vagrant/x.sh
+			echo "#" >> /vagrant/x.sh
+			echo "# x.sh" >> /vagrant/x.sh
+			echo 'vagrant ssh data1 -c "sudo /opt/mysql/server-5.7/bin/ndbd || true"' >> /vagrant/x.sh
+			echo 'vagrant ssh data2 -c "sudo /opt/mysql/server-5.7/bin/ndbd || true"' >> /vagrant/x.sh
+			echo 'vagrant ssh management -c "sudo systemctl start mysqld || true"' >> /vagrant/x.sh
+			echo 'vagrant ssh management -c \"mysql -uroot -e \\\"CREATE DATABASE IF NOT EXISTS drupal\\\"\"' >> /vagrant/x.sh
+			str1="'drupal'@'%' IDENTIFIED BY 'PSI'"
+			str2='\\""'
+			echo 'vagrant ssh management -c "mysql -uroot -e \\"GRANT ALL ON drupal.* TO '$str1$str2 >> /vagrant/x.sh
+			chmod +x /vagrant/x.sh
+			
+			echo "\n     --- Installation of sql node complete ---\n"
+      if [ -f /var/run/reboot-required ]; then
+    		echo "            ***   REBOOT REQUIRED  ***"
+    		echo "                                      "
+			fi
+  	SHELL
+  end
+  
+  #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+  
+  config.vm.define "mysite1" do |mysite1|
+  	mysite1.vm.provider :virtualbox do |v|
+      v.memory = 2048
+      v.cpus = 1
+    end
+    mysite1.vm.box = "bento/ubuntu-16.04"
+    mysite1.vm.hostname = "mysite1"
+    mysite1.vm.network "public_network", bridge: "en0: Ethernet"
+    mysite1.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update && sudo apt-get upgrade -y
+      sudo apt-get install -y virtualbox-guest-dkms
+      sudo apt-get install -y avahi-daemon libaio1
+      timedatectl set-timezone Europe/Warsaw
+      sudo timedatectl set-ntp on
+      sudo apt-get install -y apache2
+      sudo apt-get install cron
+      if grep -qF "ServerName localhost" /etc/apache2/apache2.conf; then
+   			echo "Servername already set to localhost"
+			else
+   			echo "ServerName localhost" >> /etc/apache2/apache2.conf
+			fi
+      sudo apachectl restart
+      sudo apache2ctl configtest
+      apache2 -v
+      
+      sudo apt-get install python-software-properties software-properties-common
+			sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
+			sudo apt-get update
+			
+			sudo apt-get -y install php7.1
+			sudo apt-get -y install php7.1-xml
+			sudo phpenmod simplexml
+			sudo apt-get -y install php7.1-gd
+			sudo phpenmod gd
+			#sudo apt-get install php7.1-mbstring
+			#sudo phpdismod mbstring									#disable -> drupal bug
+			sudo apt-get install php7.1-mysql
+			sudo phpenmod mysqli
+			sudo phpenmod mysqlnd
+			sudo phpenmod pdo_mysql
+			ol=';date.timezone ='
+			nl='date.timezone = "Europe/Warsaw"'
+			sed -i "s%$ol%$nl%g" /etc/php/7.1/apache2/php.ini
+			php -v
+      sudo apachectl restart
+      sudo rm -f /var/www/html/index.html
+      
+      sudo mkdir -p /backup_www
+      cd /etc/cron.hourly
+      echo "#!/bin/sh -e" > backup_script
+      echo "#" >> backup_script
+      echo "# backup_script" >> backup_script
+      
+      echo "sudo rsync -arz /vagrant/www/ /backup_www/" >> backup_script
+      sudo chmod +x /etc/cron.hourly/backup_script
+      
+      echo "\n     --- Installation of mysite1 complete ---\n"
+      if [ -f /var/run/reboot-required ]; then
+    		echo "            ***   REBOOT REQUIRED  ***"
+    		echo "                                      "
+			fi
+    SHELL
+    config.vm.synced_folder "www/html", "/var/www/html", id: "vagrant-root", 
+    owner: "vagrant", group: "www-data",
+    mount_options: ["dmode=775,fmode=664"]		#nie może być spacji po przecinku (między el. tablicy)!
+  end
+  
+  config.vm.define "mysite2" do |mysite2|
+  	mysite2.vm.provider :virtualbox do |v|
+      v.memory = 2048
+      v.cpus = 1
+    end
+    mysite2.vm.box = "bento/ubuntu-16.04"
+    mysite2.vm.hostname = "mysite2"
+    mysite2.vm.network "public_network", bridge: "en0: Ethernet"
+    mysite2.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update && sudo apt-get upgrade -y
+      sudo apt-get install -y avahi-daemon libaio1
+      timedatectl set-timezone Europe/Warsaw
+      sudo timedatectl set-ntp on
+      sudo apt-get install -y apache2
+      sudo apt-get install cron
+      if grep -qF "ServerName localhost" /etc/apache2/apache2.conf; then
+   			echo "Servername already set to localhost"
+			else
+   			echo "ServerName localhost" >> /etc/apache2/apache2.conf
+			fi
+      sudo apachectl restart
+      sudo apache2ctl configtest
+      apache2 -v
+      
+      sudo apt-get install python-software-properties software-properties-common
+			sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
+			sudo apt-get update
+			
+			sudo apt-get -y install php7.1
+			sudo apt-get -y install php7.1-xml
+			sudo phpenmod simplexml
+			sudo apt-get -y install php7.1-gd
+			sudo phpenmod gd
+			#sudo apt-get install php7.1-mbstring
+			#sudo phpdismod mbstring									#disable -> drupal bug
+			sudo apt-get install php7.1-mysql
+			sudo phpenmod mysqli
+			sudo phpenmod mysqlnd
+			sudo phpenmod pdo_mysql
+			ol=';date.timezone ='
+			nl='date.timezone = "Europe/Warsaw"'
+			sudo sed -i "s%$ol%$nl%g" /etc/php/7.1/apache2/php.ini
+			php -v
+      sudo apachectl restart
+      
+      sudo wget http://ftp.drupal.org/files/projects/drupal-7.32.tar.gz
+			sudo tar xzvf drupal-7.32.tar.gz
+			cd drupal-7.32
+			sudo rsync -avz . /vagrant/www/html
+			sudo mkdir -p /vagrant/www/html/sites/default/files
+			sudo chmod 664 /vagrant/www/html/sites/default/settings.php
+			sudo cp /vagrant/www/html/sites/default/default.settings.php /vagrant/www/html/sites/default/settings.php
+
+			sudo chown -R :www-data /var/www/html/*
+			sudo rm -f /var/www/html/index.html
+			sudo rm -f ../drupal-7.32.tar.gz
+			
+			sudo mkdir -p /backup_www
+      cd /etc/cron.hourly
+      echo "#!/bin/sh -e" > backup_script
+      echo "#" >> backup_script
+      echo "# backup_script" >> backup_script
+      echo "sudo rsync -arz /vagrant/www/ /backup_www/" >> backup_script
+      sudo chmod +x /etc/cron.hourly/backup_script
+      echo "\n     --- Installation of mysite2 complete ---\n"
+      if [ -f /var/run/reboot-required ]; then
+    		echo "            ***   REBOOT REQUIRED  ***"
+    		echo "                                      "
+			fi
+    SHELL
+    config.vm.synced_folder "www/html", "/var/www/html"
+  	config.trigger.after :up, :vm => "mysite2" do
+  		run "./x.sh"
+  		#run 'vagrant ssh data1 -c "sudo /opt/mysql/server-5.7/bin/ndbd"'
+			#run 'vagrant ssh data2 -c "sudo /opt/mysql/server-5.7/bin/ndbd"'
+			#run 'vagrant ssh management -c "sudo systemctl start mysqld"'
+
+			#run 'vagrant ssh management -c "mysql -uroot -e \"CREATE DATABASE drupal\""'
+			#run 'vagrant ssh management -c "mysql -uroot -e \"GRANT ALL ON drupal.* TO \'drupal\'@\'%\' IDENTIFIED BY \'PSI\'\""'
+  	end
+  end
+end
