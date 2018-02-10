@@ -17,5 +17,5 @@ sudo service mysql restart
 echo '------------------------------------mySql final start------------------------------------------'
 mysqladmin -u root password $PASS
 mysql -uroot -p$PASS -e "create database newdrupal"
-mysql -uroot -p$PASS -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON drupal.* TO 'drupalsuser'@'%' IDENTIFIED BY 'myDrupalPassword';"
+mysql -uroot -p$PASS -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON newdrupal.* TO 'drupalsuser'@'%' IDENTIFIED BY 'myDrupalPassword';"
 echo '-------------------------------------end of database configuration-------------------------'
